@@ -2,6 +2,7 @@ package com.example.realsoft.card_service.controller;
 
 import com.example.realsoft.card_service.exception.CardNotFound;
 import com.example.realsoft.card_service.model.CardDto;
+import com.example.realsoft.card_service.model.CommentDto;
 import com.example.realsoft.card_service.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,5 +41,10 @@ public class CardController {
     @GetMapping("/list/{id}")
     public ResponseEntity<List<CardDto>> getCardsByList(@PathVariable(name = "id") Long listId) {
         return ResponseEntity.ok(cardService.getCardsByList(listId));
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentDto>> getCommentsByCard(@PathVariable(name = "id") Long cardId) throws CardNotFound {
+        return ResponseEntity.ok(cardService.getCommentsByCard(cardId));
     }
 }

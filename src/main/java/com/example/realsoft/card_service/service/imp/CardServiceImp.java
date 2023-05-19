@@ -3,11 +3,16 @@ package com.example.realsoft.card_service.service.imp;
 import com.example.realsoft.card_service.entity.Card;
 import com.example.realsoft.card_service.exception.CardNotFound;
 import com.example.realsoft.card_service.model.CardDto;
+import com.example.realsoft.card_service.model.CommentDto;
 import com.example.realsoft.card_service.repository.CardRepository;
 import com.example.realsoft.card_service.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +24,7 @@ public class CardServiceImp implements CardService {
 
     private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
+    private final RestTemplate restTemplate;
 
     @Override
     public CardDto createCard(CardDto cardDto) {
@@ -56,6 +62,23 @@ public class CardServiceImp implements CardService {
         return cardRepository.getCardsByListId(listId).stream()
                 .map(card -> modelMapper.map(card, CardDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentDto> getCommentsByCard(Long cardId) throws CardNotFound {
+        Card card = cardRepository.findById(cardId).orElse(null);
+        if (card == null) {
+            throw new CardNotFound("Id", cardId);
+        }
+
+        String commentsUrl = "http://comment-service/realsoft/trello/comments/card/" + cardId;
+        ResponseEntity<List<CommentDto>> response = restTemplate.exchange(
+                commentsUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<CommentDto>>() {}
+        );
+        return response.getBody();
     }
 
     private Card findCard(Long cardId) throws CardNotFound {
