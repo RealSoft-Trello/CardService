@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -47,6 +49,13 @@ public class CardServiceImp implements CardService {
     @Override
     public void deleteCard(Long cardId) throws CardNotFound {
         cardRepository.delete(findCard(cardId));
+    }
+
+    @Override
+    public List<CardDto> getCardsByList(Long listId) {
+        return cardRepository.getCardsByListId(listId).stream()
+                .map(card -> modelMapper.map(card, CardDto.class))
+                .collect(Collectors.toList());
     }
 
     private Card findCard(Long cardId) throws CardNotFound {

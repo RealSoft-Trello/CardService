@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class CardDto {
+    private Long cardId;
     private String title;
     private Long listId;
     private String description;

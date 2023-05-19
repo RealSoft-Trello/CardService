@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("realsoft/trello/cards")
 @RequiredArgsConstructor
@@ -33,5 +35,10 @@ public class CardController {
     public ResponseEntity<String> deleteCard(@PathVariable(name = "id") Long cardId) throws CardNotFound {
         cardService.deleteCard(cardId);
         return ResponseEntity.ok("Card deleted successfully!");
+    }
+
+    @GetMapping("/list/{id}")
+    public ResponseEntity<List<CardDto>> getCardsByList(@PathVariable(name = "id") Long listId) {
+        return ResponseEntity.ok(cardService.getCardsByList(listId));
     }
 }
