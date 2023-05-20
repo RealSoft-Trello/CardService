@@ -2,12 +2,15 @@ package com.example.realsoft.card_service.service.imp;
 
 import com.example.realsoft.card_service.entity.Card;
 import com.example.realsoft.card_service.exception.CardNotFound;
+import com.example.realsoft.card_service.model.CardAssign;
 import com.example.realsoft.card_service.model.CardDto;
 import com.example.realsoft.card_service.model.CommentDto;
 import com.example.realsoft.card_service.repository.CardRepository;
 import com.example.realsoft.card_service.service.CardService;
+import com.example.realsoft.card_service.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ public class CardServiceImp implements CardService {
     private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
     private final RestTemplate restTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public CardDto createCard(CardDto cardDto) {
@@ -79,6 +83,16 @@ public class CardServiceImp implements CardService {
                 new ParameterizedTypeReference<List<CommentDto>>() {}
         );
         return response.getBody();
+    }
+
+    @Override
+    public void assignCardToUser(Long cardId, Long userId) throws CardNotFound {
+        Card card = cardRepository.findById(cardId).orElse(null);
+        if (card == null) {
+            throw new CardNotFound("ID", cardId);
+        }
+        CardAssign cardAssign = new CardAssign(cardId, userId, card.getTitle());
+        rabbitTemplate.convertAndSend(Constants.EXCHANGE, Constants.ROUTING_KEY, cardAssign);
     }
 
     private Card findCard(Long cardId) throws CardNotFound {

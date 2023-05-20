@@ -47,4 +47,13 @@ public class CardController {
     public ResponseEntity<List<CommentDto>> getCommentsByCard(@PathVariable(name = "id") Long cardId) throws CardNotFound {
         return ResponseEntity.ok(cardService.getCommentsByCard(cardId));
     }
+
+    @PostMapping("/{id}/assign/{userId}")
+    public ResponseEntity<Void> assignCard(
+            @PathVariable(name = "id") Long cardId,
+            @PathVariable(name = "userId") Long userId
+    ) throws CardNotFound {
+        cardService.assignCardToUser(cardId, userId);
+        return ResponseEntity.noContent().build();
+    }
 }

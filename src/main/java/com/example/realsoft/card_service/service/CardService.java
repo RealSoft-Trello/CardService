@@ -14,4 +14,5 @@ public interface CardService {
 
     List<CardDto> getCardsByList(Long listId);
     List<CommentDto> getCommentsByCard(Long cardId) throws CardNotFound;
+    void assignCardToUser(Long cardId, Long userId) throws CardNotFound;
 }
